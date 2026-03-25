@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+N:קרקסוני;מתן;;;
+FN:מתן קרקסוני
+item1.TEL;waid=972503797759:+972 50-379-7759
+item1.X-ABLabel:נייד
+END:VCARD_$!<VCard-Separator>!$_BEGIN:VCARD
+VERSION:3.0
+N:דבוש;ניב;;;
+FN:ניב דבוש
+item1.TEL;waid=972502580012:+972 50-258-0012
+item1.X-ABLabel:נייד
+END:VCARD

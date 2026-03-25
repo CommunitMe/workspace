@@ -1,0 +1,21 @@
+BEGIN:VCARD
+VERSION:3.0
+N:;IDF;;;
+FN:IDF
+item1.TEL:+972 3-957-6985
+item1.X-ABLabel:חמ"ל ידין
+item2.TEL:+972 3-957-6623
+item2.X-ABLabel:תשתיות
+item3.TEL:+972 3-957-5968
+item3.X-ABLabel:לשכת מצו"ב
+item4.TEL:+972 3-957-6181
+item4.X-ABLabel:חמ"ל לוטם
+item5.TEL:+972 3-957-6648
+item5.X-ABLabel:TAC
+item6.TEL:+972 3-957-5180
+item6.X-ABLabel:מרפאת לוטם
+item7.TEL:*6690
+item7.X-ABLabel:מוקד רפואה
+item8.TEL:+972 3-957-6650
+item8.X-ABLabel:חמ"ל מצו"ב
+END:VCARD

@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:;מרפאת קריה חדש!!!;;;
+FN:מרפאת קריה חדש!!!
+TEL;type=HOME:+972 3-569-3333
+END:VCARD_$!<VCard-Separator>!$_BEGIN:VCARD
+VERSION:3.0
+N:;מרפאה קריה וואטסאפ;;;
+FN:מרפאה קריה וואטסאפ
+X-WA-BIZ-NAME:מרפאת מטכ"ל
+TEL;type=CELL;type=VOICE;waid=972529247542:+972 52-924-7542
+END:VCARD

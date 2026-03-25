@@ -1,0 +1,17 @@
+BEGIN:VCARD
+VERSION:3.0
+N:אוחיון - 40;נועם;;;
+FN:נועם אוחיון - 40
+item1.TEL;waid=972526638764:+972 52-663-8764
+item1.X-ABLabel:בית
+item2.EMAIL;type=INTERNET:noam.ohayon.40@gmail.com
+item2.X-ABLabel:אחר
+END:VCARD_$!<VCard-Separator>!$_BEGIN:VCARD
+VERSION:3.0
+N:42;נעם שיפטן;-;;
+FN:נעם שיפטן - 42
+item1.TEL;waid=972585531415:+972 58-553-1415
+item1.X-ABLabel:בית
+item2.EMAIL;type=INTERNET:noam.shiftan.42@gmail.com
+item2.X-ABLabel:INTERNET
+END:VCARD
