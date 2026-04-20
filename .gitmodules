@@ -1,5 +1,4 @@
 # CommunitMe Workspace — Submodules
-# Each entry maps a local path to its GitHub remote.
 # Clone everything at once:
 #   git clone --recurse-submodules https://github.com/CommunitMe/workspace.git commy
 
@@ -8,51 +7,29 @@
 [submodule "members"]
 	path = members
 	url = https://github.com/CommunitMe/members.git
-	# Next.js 16, React 19, Prisma, Tailwind v4, next-intl (Hebrew/RTL)
 
 [submodule "Admin_system"]
 	path = Admin_system
 	url = https://github.com/CommunitMe/Admin_system.git
-	# Express 4, TypeScript, raw PostgreSQL, JWT cookies, Jest
 
 [submodule "community-proj"]
 	path = community-proj
 	url = https://github.com/CommunitMe/community-proj.git
-	# React 18 (JavaScript), CRA, MUI 6, i18next, Formik
 
 [submodule "Onboarding"]
 	path = Onboarding
 	url = https://github.com/CommunitMe/Onboarding.git
-	# Monorepo: Vite/React 18 + Express, Passport OAuth, Prisma
 
 [submodule "notifications/utils"]
 	path = notifications/utils
 	url = https://github.com/CommunitMe/utils.git
-	# Shared utilities used by the notifications microservice
 
 # ── Infrastructure ─────────────────────────────────────────────────────────────
 
-[submodule "cme_db/cme_db"]
-	path = cme_db/cme_db
+[submodule "cme_db"]
+	path = cme_db
 	url = https://github.com/CommunitMe/cme_db.git
-	# Database schema and migrations
 
-[submodule "temp-mock"]
-	path = temp-mock
-	url = https://github.com/CommunitMe/temp-mock.git
-	# Temporary mock server for local development
-
-# ── Internal tooling ───────────────────────────────────────────────────────────
-
-[submodule "hivemind"]
-	path = hivemind
-	url = https://github.com/cohen-liel/hivemind.git
-	# AI orchestration layer (OMC / hivemind)
-
-[submodule "my-tests/new_whatsapp"]
-	path = my-tests/new_whatsapp
-	url = https://github.com/yehonatanYifrach/new_whatsapp.git
-
-[submodule "my-tests/whatsapp"]
-	path = my-tests/whatsapp
-	url = https://github.com/yehonatanYifrach/whatsapp.git
+[submodule "pricelist_tools"]
+	path = pricelist_tools
+	url = https://github.com/CommunitMe/pricelist_tools.git

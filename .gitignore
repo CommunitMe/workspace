@@ -7,23 +7,26 @@ Thumbs.db
 *.swp
 *.swo
 
-# Claude local state (not shared)
-.claude/settings.local.json
-.claude/worktrees/
-.claude/memory/
-.claude/launch.json
-
 # Secrets — never commit env files
 **/.env
 **/.env.*
 !**/.env.example
 
-# Temp / scratch
-temp-*
+# Local scratch / experiments (not part of the product)
+_scratch/
+my-tests/
+
+# Temp files
 *.tmp
-NOTES.md
 COMY1-*.md
 .notes.json
+
+# Claude local state (not shared between developers)
+.claude/settings.local.json
+.claude/worktrees/
+.claude/memory/
+.claude/launch.json
+.claude/settings.json
 
 # Hivemind runtime state
 .hivemind/
