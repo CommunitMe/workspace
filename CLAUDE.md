@@ -22,10 +22,14 @@ cd Admin_system   && npm install && cd ..
 cd community-proj && npm install && cd ..
 cd Onboarding     && npm install && cd ..
 
-# 4. Set up environment variables (copy the example files):
-cp members/.env.example        members/.env.local
-cp Admin_system/.env.example   Admin_system/.env
-cp Onboarding/.env.example     Onboarding/.env
+# 4. Set up environment variables
+# Download .env files from Google Drive (ask a team member for access):
+# https://drive.google.com/drive/folders/1hkM4YgEO3ANzmgdsiXzxTboRK8-XTZuV
+# Place each file in its project directory:
+#   members/.env.local
+#   Admin_system/.env
+#   Onboarding/.env
+#   community-proj/.env
 
 # 5. Start the database (PostgreSQL via Docker):
 cd cme_db && docker-compose up -d && cd ..
