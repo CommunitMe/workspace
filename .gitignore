@@ -13,6 +13,11 @@ Thumbs.db
 .claude/memory/
 .claude/launch.json
 
+# Secrets — never commit env files
+**/.env
+**/.env.*
+!**/.env.example
+
 # Temp / scratch
 temp-*
 *.tmp
