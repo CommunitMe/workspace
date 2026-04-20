@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
+*.swo
+
+# Claude local state (not shared)
+.claude/settings.local.json
+.claude/worktrees/
+.claude/memory/
+.claude/launch.json
+
+# Temp / scratch
+temp-*
+*.tmp
+NOTES.md
+COMY1-*.md
+.notes.json
+
+# Hivemind runtime state
+.hivemind/
