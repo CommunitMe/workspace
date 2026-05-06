@@ -1,0 +1,23 @@
+{
+  "skill_name": "task-creator",
+  "evals": [
+    {
+      "id": 0,
+      "name": "ceo-cross-repo-feature",
+      "prompt": "Non-technical CEO requests a community-manager feature that ripples into supplier and notifications. Tests cross-repo evaluation, batched-by-department questioning, and clear surfacing of unknowns.",
+      "expected_output": "A complete ticket markdown that identifies community-proj as primary, Admin_system + notifications as touched, with open questions for the team and clean acceptance criteria."
+    },
+    {
+      "id": 1,
+      "name": "vague-bug-mandatory-fields",
+      "prompt": "Vague bug report ('notifications sometimes don't arrive'). Tests bug-mandatory-fields enforcement and that the skill drives toward repro/severity/env even when requester is hand-wavy.",
+      "expected_output": "A bug ticket that either (a) extracts repro/env/severity through interview or (b) clearly flags them as ⚠ Open questions blocking execution."
+    },
+    {
+      "id": 2,
+      "name": "update-flow-with-new-questions",
+      "prompt": "Requester returns with team feedback on an existing ticket. The new info raises new questions. Tests that the update flow re-checks for gaps and asks new questions instead of silently absorbing the update.",
+      "expected_output": "An updated ticket draft with a Update YYYY-MM-DD changelog section, plus new open questions raised by the team feedback."
+    }
+  ]
+}
