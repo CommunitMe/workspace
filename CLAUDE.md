@@ -63,7 +63,7 @@ When asked to implement a ticket (`COMY1-*`, `COMY-ADMIN-*`, etc.):
 8. **Browser QA** — For UI tasks, start dev server and check visually
 9. **PR** — Branch `claude/{TICKET}-{desc}`, commit inside the project, push, `gh pr create`
 10. **Bump submodule pointer** — Back in workspace root: `git add {project} && git commit -m "chore: update {project} submodule"`
-11. **Learn** — Spawn `upgrader` agent to update lessons and SKILL.md
+11. **Learn** — Spawn `upgrader` agent to update lessons, SKILL.md, and (for any frontend work) `.claude/skills/frontend-design/references/component-registry.md`
 
 **DO NOT ask for approval.** Execute autonomously. Only ask if genuinely blocked.
 
