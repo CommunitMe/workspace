@@ -46,7 +46,26 @@ Read [`references/project-design-anchors.md`](references/project-design-anchors.
 
 **Cross-project rule:** these apps look slightly different on purpose (members is consumer-facing, admins is operator-facing, onboarding is pre-platform). Don't try to make them match each other. A button in members is not the same as a button in admins. **Match the app you're in.**
 
-When uncertain about a project-specific convention, defer to that project's skill or its design anchor file. Don't import patterns across projects unless the user explicitly asks.
+When uncertain about a project-specific convention, defer to that project's skill or its design anchor file.
+
+### Cross-project pattern transfer — what's allowed
+
+There are four kinds of "borrow from another app", and only one of them is allowed by default:
+
+| Kind | Example | Rule |
+|---|---|---|
+| **Visual** — colors, spacing, fonts, radius | Use `members`' primary blue in `community-proj` | **Not allowed.** Each app's visual language is deliberate. Match what's already in the target app. There is no cross-app visual consistency requirement — a "Save" button in `community-proj` is not supposed to look like the "Save" button in `members`. |
+| **UX idea** — how a problem is solved (infinite scroll behavior, empty-state pattern, multi-step form flow) | `members` solves long lists with infinite scroll; reuse the same UX shape in `community-proj` | **Allowed as a fallback only.** First, look for a matching pattern inside the target app. If you find one, use it. Only if the target app has nothing analogous, you may reference another app's UX idea — but reimplement it in the target app's stack and idioms. Do **not** import the visual styling along with the idea. Note the source in the PR: *"Modeled after `members/src/components/ListPage.tsx`; rewritten in MUI."* |
+| **Code** — copy a component file from one app to another | Copy `AddressMapInput.tsx` from `members` to `community-proj` | **Not allowed.** The stacks differ (Tailwind vs MUI, TS vs JS, Next vs CRA). Copy-pasted code becomes a maintenance trap. Reimplement in the target stack instead. |
+| **Shared package** — extract code into a workspace package | Move shared types into a new `packages/shared` like Onboarding has | **Project-level decision — never made alone.** Only Onboarding currently has `packages/shared`. The other repos don't have a shared workspace at all. Do not propose or implement this without explicit human approval — it's a build/CI/infrastructure change. |
+
+**Default order of search when looking for a pattern:**
+
+1. Existing screens in the **same app** (the right answer 95% of the time).
+2. The project's own design anchor file (`references/project-design-anchors.md`).
+3. *Only if 1 and 2 turn up nothing:* another app's UX idea, reimplemented in the target stack. Cite the source in the PR.
+
+If even that doesn't yield a clear answer, this is genuinely a new pattern — flag it in the PR's `⚠ Design review needed` block.
 
 ## The cardinal rule — don't invent design
 
@@ -101,12 +120,67 @@ Before building anything, scan the project's existing components folder. Look fo
 Colors, spacing, typography, radius, shadows — read from the theme/tokens file. Never `color: #abc`, `padding: 13px`, or `fontFamily: "Arial"` in component code. If the value you need isn't in the tokens, that's a design question, not a coding workaround.
 
 ### i18n, not hardcoded strings
-Every user-facing string goes through the project's i18n system (`next-intl` for members, `i18next` for community-proj, the Onboarding loader for Onboarding). Never put English or Hebrew text directly in JSX. Add the key to all locale files.
 
-For new strings:
-- Add the English first.
-- For Hebrew: follow the **gender-neutral rule**. Use male plural ("ברוכים הבאים" not "ברוך הבא") or neutral phrasing ("אותך", "בשבילך"). If you're not confident the Hebrew is gender-neutral and natural, leave a `// TODO: HE translation review` and ask the user.
-- For other locales (ru, etc.) — add the English value as a placeholder if no translator is available, with a TODO marker.
+Every user-facing string goes through the project's i18n system. Never put English or Hebrew text directly in JSX.
+
+**Per-project file shapes** (these differ — don't mix them up):
+
+| Project | System | File shape |
+|---|---|---|
+| `members/` | `next-intl` | One folder per locale (`translations/en/`, `translations/he/`), many namespace files inside (`common.json`, `header.json`, …). Same file name appears in every locale folder. |
+| `community-proj/` | `i18next` | Same pattern: `public/locales/en/`, `public/locales/he/`, namespace files inside. |
+| `Onboarding/` | Custom loader | A **single** `public/langs/data.json` file. Every leaf key contains all locales nested: `{ "en": "…", "he": "…", "ru": "…" }`. Don't add separate locale files. |
+
+**Locales required:**
+- `members/` and `community-proj/`: **English + Hebrew**.
+- `Onboarding/`: **English + Hebrew + Russian**.
+
+**The workflow for any new string:**
+
+1. **Pick (or create) the right namespace file.** Reuse an existing namespace if the string belongs there. New namespace = new file in every locale folder (members / community-proj) or new top-level section in `data.json` (Onboarding). Match the existing key naming style of the file.
+2. **Add the key to *every* locale.** No missing keys — the apps fall back ugly when a locale is missing. For `members/` and `community-proj/`, add to both `en/` and `he/`. For `Onboarding/`, add `en`, `he`, and `ru` inside the same key in `data.json`.
+3. **Write each language natively.** No placeholders, no leaving English in a Hebrew slot.
+   - **English:** native.
+   - **Hebrew:** follow the gender-neutral rule (see below). Write it natively — don't punt to TODO.
+   - **Russian** (Onboarding only): the team has no native Russian speaker. Claude writes it. Be careful and idiomatic — the goal is text a Russian speaker would not flag as machine-translated.
+4. **Flag the new strings in the PR.** All strings get human review at PR time (see the [Translation review block](#the-pr-translation-review-block) below).
+
+**Hebrew gender-neutral rule.**
+Use male plural ("ברוכים הבאים", not "ברוך הבא") or neutral phrasing ("אותך", "בשבילך"). Never gender-specific singular unless the surface is deliberately addressing one gender (rare). Write naturally — Hebrew that reads as machine-translated English is a fail even when grammatically correct.
+
+**No `TODO` markers in the JSON values.** Past versions of this skill suggested sentinels like `[TODO_HE]` in the value. Don't. The PR review block is the only tracking — once merged, every string is considered final unless flagged separately.
+
+### The PR translation review block
+
+When a PR adds or changes user-facing strings, include a clearly-marked review block in the PR description:
+
+```markdown
+## ⚠ Translation review needed
+
+Please verify the Hebrew (and Russian, where applicable) reads naturally and is gender-neutral.
+
+| Key | EN | HE | RU |
+|---|---|---|---|
+| `kard.welcomeTitle` | Welcome to your community | ברוכים הבאים לקהילה שלכם | — |
+| `kard.welcomeBody` | Start by exploring nearby suppliers | התחילו בגילוי ספקים באזור | — |
+
+(Onboarding example with Russian:)
+
+| Key | EN | HE | RU |
+|---|---|---|---|
+| `welcome.subtitle` | Choose your role | בחרו את התפקיד שלכם | Выберите вашу роль |
+
+cc @Shoshana-Chaya @yehonatanYifrach
+```
+
+The block must include:
+- Every new or changed key.
+- All locales side-by-side so reviewers can spot bad translations at a glance.
+- A mention of `@Shoshana-Chaya` and `@yehonatanYifrach`.
+
+If the PR also has a `⚠ Design review needed` block, keep them as **two separate blocks** — different reviewers may focus on different concerns, and merging them makes both harder to scan.
+
+**No external tooling.** All translation work is direct edits to the JSON files in the repo. There's no Lokalise / Crowdin / spreadsheet — the PR is the workflow.
 
 ### RTL/LTR symmetry
 Every layout must work in both directions. Hebrew is RTL; English is LTR. Specifically:
@@ -141,6 +215,22 @@ The team uses an accessibility plugin that catches additional issues, so the flo
 ### No new dependencies without justification
 Don't `npm install` a new package to solve a problem the existing stack can solve. If a new dep is genuinely needed, flag it — the bundle and the maintenance surface are real costs.
 
+### Animation and motion — use library defaults, don't invent
+
+There is **no formal motion system** across these apps. No duration tokens, no easing tokens, no installed motion library (no framer-motion, react-spring, gsap). The animations users see today come entirely from library defaults — Tailwind / shadcn in `members/`, MUI in `community-proj/` and `Onboarding/`.
+
+The rule:
+
+- **Use library defaults.** Tailwind's `transition-*` / `duration-*` / `ease-*` utilities and shadcn's built-in component animations in `members/`. MUI's built-in `Transition` / `Fade` / `Slide` / default Dialog / Menu / Drawer animations in the others.
+- **Do not write custom timings or easings inline.** No `transition: 0.4s ease-in-out` ad hoc, no `style={{ transition: '...' }}`, no custom `@keyframes` — these accumulate into inconsistency fast.
+- **Do not install a motion library.** Same dependency rule as elsewhere.
+
+**This is the one exception to the "proceed and flag in PR" pattern.** If a task genuinely requires animation that the library defaults can't provide — a custom keyframe sequence, a non-default duration tier, a coordinated multi-element transition — **stop and ask in chat**. Do not pick a value and flag it in the PR. Motion is a system-level decision the team has not made yet, and ad-hoc choices would drift the system in a way that's hard to claw back.
+
+The exact phrasing when this happens:
+
+> "This task needs an animation that the library defaults don't cover (e.g., [specific need]). The team hasn't defined a motion system, so I can't pick durations/easings on my own. Please decide: [options]. I'll wait."
+
 ## Planning checklist
 
 When `task-creator` is in the design/UX batch or the tech-impact batch for a frontend task, surface these questions to the requester. Don't ask all of them — ask the ones the request hasn't already answered.
@@ -162,10 +252,14 @@ When `task-creator` is in the design/UX batch or the tech-impact batch for a fro
 Before you submit / open a PR:
 
 - [ ] Read the project-specific skill (`commy-development`, `onboarding-development`, etc.) and followed its conventions.
-- [ ] Re-used existing components where possible. Did not create new primitives unless flagged and approved.
+- [ ] Ran the discovery checklist (list folder → grep keywords → read closest matches) before creating any new component.
+- [ ] Re-used existing components where possible. New components and non-trivial extensions are flagged in the PR's `⚠ Design review needed` block with `@Shoshana-Chaya @yehonatanYifrach` mentions.
+- [ ] If a component was created, deleted, or meaningfully changed, the `references/component-registry.md` file was updated in the same PR (once that file exists).
 - [ ] All values come from tokens (colors, spacing, fonts, radius). No hardcoded hex codes or px values.
 - [ ] All user-facing strings go through i18n. No raw English/Hebrew in JSX.
-- [ ] Hebrew copy is gender-neutral (male plural or neutral phrasing).
+- [ ] Every new key is present in every required locale (en + he for `members`/`community-proj`; en + he + ru for `Onboarding`). No missing locales, no TODO sentinels in values.
+- [ ] Hebrew copy is gender-neutral (male plural or neutral phrasing) and reads naturally.
+- [ ] If strings were added or changed, the PR includes a `⚠ Translation review needed` block listing every key with all locales side-by-side and `@Shoshana-Chaya @yehonatanYifrach` mentioned.
 - [ ] Layout works in both LTR and RTL. Handed elements (icons, alignment) verified.
 - [ ] Layout works on mobile and desktop at the project's breakpoints.
 - [ ] Empty, loading, and error states implemented.
@@ -190,47 +284,102 @@ Specifically run the app when:
 
 Do **not** skip this for "small" UI changes — small UI changes are often the ones that look subtly wrong.
 
-## When patterns disagree across screens
+## Component creation — the decision flow
 
-If half the screens in the app do X and half do Y (e.g., some forms have inline validation, some have submit-time validation), do not pick one and proceed. **This is a design/product decision and needs to be made deliberately.**
+Three actions, three rules. This applies to every UI work session.
 
-Surface it as a question:
-> "I see two patterns for this in the codebase — [pattern A on screens X, Y] and [pattern B on screens Z, W]. Which is the intended direction? This affects UX consistency."
-
-Add it to the ticket's `⚠ Open questions blocking execution` if you're in planning mode. Pause and ask if you're in execution mode and the choice is non-trivial.
-
-## When you genuinely can't infer
-
-For *small* changes (adjust a copy string, add a checkbox to an existing form, fix a spacing bug): if you can confidently pattern-match from existing screens, **proceed and flag your inference in the PR description**: *"No Figma; I matched the spacing and font from the [adjacent screen]. Design please verify."*
-
-For *large* changes (new screen, new component primitive, new visual surface): **pause and ask**. Do not invent a design.
-
-The line between small and large isn't bright, but the test is: *would a designer be surprised by what I built?* If yes, it's large. If no, it's small.
-
-## When to pause vs proceed
-
-| Situation | Action |
+| Action | Rule |
 |---|---|
-| Existing component fits → use it | Proceed |
-| Existing component almost fits, small extension | Proceed, note the extension in PR |
-| New variant of an existing component | Pause, ask product/design |
-| New component primitive (e.g., new "Stepper") | Pause, ask product/design |
-| New design token (color, spacing, font) | Pause, ask design — this is a system decision |
-| Existing patterns disagree | Pause, ask — see [When patterns disagree](#when-patterns-disagree-across-screens) |
-| Small copy or behavior change in an existing surface | Proceed |
-| Mobile breakpoint behavior unclear from existing screens | Pause, ask |
-| Animation / transition not in the system | Pause, ask — animation is part of the system |
+| **Use** an existing component as-is | Always proceed. No flag needed. |
+| **Extend** an existing component (additive only) | Proceed. Note the extension in the PR description. |
+| **Create** a new component | Proceed with best judgment, then flag prominently in the PR. |
+
+"Additive only" means: a new prop, a new variant, a new optional behavior. Anything that **changes** an existing prop's behavior, alters layout/spacing of existing usages, or removes/renames an export is **not** additive — treat it as creating new.
+
+### Mandatory discovery before creating
+
+Before creating any new component, complete all three steps:
+
+1. **List the project's components folder.** Read every name. Locations: `members/src/components/ui/` and `members/src/components/`, `community-proj/src/Components/`, `Onboarding/packages/client/src/components/` and `Onboarding/packages/client/src/components/ui/`.
+2. **Grep for functional keywords.** If you need a table, search `table`, `grid`, `list`. If a menu, search `menu`, `dropdown`, `select`. If a card, search `card`, `tile`, `item`. This catches components that don't follow the naming convention.
+3. **Read the source of the 1–2 closest matches.** Confirm they genuinely don't fit — names can mislead.
+
+Only after all three steps return no match, create.
+
+### Project-specific note: `community-proj/`
+
+Creating a new `Custom*` wrapper around an MUI component is the established pattern in `community-proj/`. It's daily work — proceed without flagging, as long as the discovery checklist above passed (don't recreate `CustomTable` if it exists). Flag in the PR only when the new wrapper introduces visually novel behavior or a new token.
+
+### The PR flag
+
+Whenever Claude makes any of the decisions listed in [What requires the flag](#what-requires-the-flag), the PR description must include a clearly-marked review block:
+
+```markdown
+## ⚠ Design review needed
+
+**What I did:** Created a new primitive `IconButton` because the existing `Button` couldn't render an icon-only state without breaking padding.
+
+**Alternative considered:** Extend `Button` with an `iconOnly` prop. I chose to create new because the spacing logic diverges enough that branching inside `Button` would be messier.
+
+**Please review:** @Shoshana-Chaya @yehonatanYifrach
+```
+
+The block must include:
+- *What* was created or decided.
+- *Why* this choice over the obvious alternative.
+- A mention of `@Shoshana-Chaya` and `@yehonatanYifrach` (Erez may also approve, but is not mentioned by default).
+
+If multiple decisions were made in one PR, list them all in one block — don't bury them in the diff.
+
+### What requires the flag
+
+Surface a `⚠ Design review needed` block in the PR for any of these:
+
+- A **new component** was created (any file added to a `components/` or `Components/` tree, including new `Custom*` wrappers in `community-proj/` *only* when they introduce visually novel behavior or a new token).
+- A **non-trivial extension** of an existing component (anything beyond an additive prop or variant).
+- A **new design token** — color, spacing, font, radius, shadow.
+- The codebase has **two disagreeing patterns** for the same problem (e.g., some forms validate inline, others on submit) and Claude picked one. List both patterns and the rationale.
+- A **composite that introduces a visually new approach** not seen in the app (e.g., a "Stepper" pattern when the app has no stepper).
+- A **new dependency** was added.
+- A **mobile breakpoint behavior** had to be inferred without a Figma reference.
+- An **animation or transition** not already in the system was added.
+
+Default test: *would a designer or PM be surprised by what I built?* If yes, flag it.
+
+Approvers (any one is sufficient): **Yonatan**, **Shoshana-Haya**, or **Erez**.
+
+### Don't pause execution
+
+This skill used to say "pause and ask" in several places. That has been replaced. **Do not pause mid-task to ask design questions.** Make the best judgment call, complete the task, and flag the decision in the PR. Reviewers will catch and correct anything wrong before merge.
+
+There are two explicit exceptions where Claude *must* pause and ask in chat (not flag in PR):
+
+1. **Animation/motion that needs custom values.** See [Animation and motion](#animation-and-motion--use-library-defaults-dont-invent). The team has not defined a motion system, so any custom timing/easing is a system-level decision that must be made before the PR is opened.
+2. **The request is fundamentally ambiguous.** E.g., "I literally cannot tell which of two completely different screens is being asked for." Ask before making the wrong thing.
+
+Everything else: proceed and flag.
+
+### Component registry
+
+The full inventory of components across all three projects lives in [`references/component-registry.md`](references/component-registry.md). Each component has a one-line description; legacy components are listed under a "do-not-reference" section per project.
+
+**Read the registry first** when running the discovery checklist. The registry is the canonical fast scan; only fall back to listing the folder directly if you suspect drift (e.g., the registry's "last scanned" date is stale relative to recent commits).
+
+**When Claude creates, deletes, or meaningfully changes a component, it must update the registry in the same PR.** The execution checklist enforces this. The post-implementation `upgrader` agent verifies it.
+
+What counts as "meaningfully change":
+- Added or removed exports.
+- Changed the component's purpose.
+- Marked or unmarked as legacy.
+- Non-trivial API change (new required prop, renamed prop, behavior shift).
+
+Cosmetic changes don't require a registry update.
 
 ## TBD — for the dev team to fill in
 
 This skill has open questions that should be answered when Yonatan / Shoshana-Haya pair on it. Until then, the model should follow the conservative defaults written above, and *flag* the question when it hits one of these areas.
 
-- **Component creation threshold.** When can the model create a new primitive vs. extend vs. ask? What's the formal threshold? Is there a registry of approved-to-create vs. ask-first?
-- **"Don't follow this" patterns.** Are there parts of the codebase that are legacy / known-not-the-pattern-we-want? Folders, components, or files to route around?
-- **Translation workflow.** New strings — add to all locale files with English placeholder + TODO? Use a translation queue/tool? Mark with a key prefix? What's the process for getting Hebrew + other locales translated?
-- **Cross-project pattern transfer.** If a great pattern exists in one app, can it be ported to another (different stack), or are projects strictly siloed?
-- **Animation / motion.** Is there a motion system (durations, easings, allowed transitions)? Or is it ad hoc per component?
-
+- **"Don't follow this" patterns beyond components.** The component registry now marks legacy *components*, but there may be folder-level or pattern-level legacy zones (entire screens / API patterns / older state-management approaches) worth flagging. Until catalogued, flag in the PR if a piece of code looks legacy and you're unsure whether to follow it.
 The model should **not** invent answers in these areas. When stuck, ask the requester or flag it explicitly.
 
 ## Why this skill exists
