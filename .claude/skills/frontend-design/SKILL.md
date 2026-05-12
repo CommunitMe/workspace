@@ -284,6 +284,51 @@ Specifically run the app when:
 
 Do **not** skip this for "small" UI changes — small UI changes are often the ones that look subtly wrong.
 
+## Mock data — for prototyping and FE-first work
+
+Sometimes the frontend ships before the backend exists. The two main cases:
+
+- **Frontend-first tickets** (`task-creator` FE-first mode) — the deliverable is a working interactive demo with mock data, reviewed by PM + design + FE dev before backend work begins.
+- **Prototyping during normal development** — the backend isn't ready yet but you want to start the frontend to unblock design review or to lock down the UX shape.
+
+In both cases, the mock-data approach matters because it determines how cleanly the frontend swaps to real data later. A sloppy mock layer becomes a real refactor when the backend lands.
+
+### Default approach
+
+Lean on these defaults unless the project clearly does something else. Match what's already in the project if there's an existing pattern.
+
+- **Small surfaces** (a single component, a copy edit, a one-screen change): inline hardcoded mock values in the component are fine. No separate file. Don't over-engineer.
+- **Lists / typed entities / anything that will eventually fetch from an API**: a typed mock-data file at the project's `__mocks__` / `mocks` / `fixtures` location (match the project's existing convention; default to `src/__mocks__/<feature>/data.ts`), consumed via a **mock hook that mimics the eventual real-API shape**. Example:
+  ```ts
+  // src/__mocks__/suppliers/data.ts
+  export const mockSuppliers: Supplier[] = [ /* ... */ ];
+
+  // src/hooks/useSuppliers.ts — mock impl
+  export function useSuppliers() {
+    return { data: mockSuppliers, isLoading: false, error: null };
+  }
+  ```
+  Why this shape: when the backend lands, only the hook's implementation changes — swap to a real React Query / SWR / `fetch` call returning the same shape. Component code does not change. This is the whole point.
+- **Forms that "submit"** in the demo: simulate success by updating local state. Show success / empty / error states using the same mock layer (e.g., a `submitMock` that returns a resolved Promise, or a rejected one if you want to demo the error state).
+- **Multi-step flows**: drive step state from local state or URL params. Persist nothing to a backend.
+- **Async-feeling realism**: where the user would normally wait on the backend (initial list load, submit, search), add a *small* simulated delay (200–500ms) so loading states are testable. Don't add delays just to feel "more real" — only where loading UI matters for the demo.
+
+### What to flag in the PR
+
+When mock data is in play, the PR description must include:
+
+- **Mock layer location** — where the mock data and hooks live, so the future "swap to real backend" PR knows what to change.
+- **Expected real-API shape** — the data shape the mock matches, so backend can build to it.
+- **What's mocked vs. what's real** — be explicit. e.g., *"List fetch is mocked; auth and routing are real."*
+
+This is what makes the eventual backend integration cheap rather than expensive.
+
+### Naming the approach in a FE-first ticket
+
+`task-creator` in FE-first mode includes a **Mock-data approach** line in the FE-First scope block. Fill that line with the specific approach you've picked for *this* feature — not the abstract defaults from this section. Example: *"Mock list at `src/__mocks__/suppliers/data.ts` with 12 sample suppliers; `useSuppliers()` hook returning `{ data, isLoading: false, error: null }`; submit simulated with 300ms delay; error state demoed via a query-param toggle."*
+
+The frontend dev reviews and amends this at graduation sign-off — that's their call. The skill's job is to propose something specific, not to ask the requester (who shouldn't be deciding mock-layer architecture).
+
 ## Component creation — the decision flow
 
 Three actions, three rules. This applies to every UI work session.
