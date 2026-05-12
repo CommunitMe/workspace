@@ -17,8 +17,17 @@
     "dev:community": "npm start --prefix community-proj",
     "dev:onboarding": "npm run dev --prefix Onboarding",
     "dev:notifications": "npm run dev --prefix notifications/utils",
-    "db:up": "cd cme_db && docker-compose up -d",
-    "db:down": "cd cme_db && docker-compose down"
+    "build": "npm run build:members && npm run build:admin && npm run build:community && npm run build:onboarding && npm run build:notifications",
+    "build:members": "npm run build --prefix members",
+    "build:admin": "npm run build --prefix Admin_system",
+    "build:community": "npm run build --prefix community-proj",
+    "build:onboarding": "npm run build --prefix Onboarding",
+    "build:notifications": "npm run build --prefix notifications/utils",
+    "pull:schemas": "npm run pull:schemas:members && npm run pull:schemas:notifications",
+    "pull:schemas:members": "npm --prefix members run prisma:pull",
+    "pull:schemas:notifications": "npm --prefix notifications/utils run prisma:dbpull && npm --prefix notifications/utils run prisma:generate",
+    "db:up": "cd cme_db && docker compose up -d",
+    "db:down": "cd cme_db && docker compose down"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
