@@ -53,11 +53,18 @@ git submodule update --init --recursive
 
 **2. Install dependencies**
 
+From the workspace root, one command installs everything:
+
 ```bash
-cd members        && npm install && cd ..
-cd Admin_system   && npm install && cd ..
-cd community-proj && npm install && cd ..
-cd Onboarding     && npm install && cd ..
+npm install
+```
+
+This installs the root runner (`concurrently`) and then cascades into every project (`members`, `Admin_system`, `community-proj`, `Onboarding`, `notifications/utils`) via the `postinstall` hook.
+
+If you only want one project, you can still install it directly:
+
+```bash
+npm run install:members      # or :admin, :community, :onboarding, :notifications
 ```
 
 **3. Set up environment variables**
@@ -68,19 +75,29 @@ https://drive.google.com/drive/folders/1hkM4YgEO3ANzmgdsiXzxTboRK8-XTZuV
 Place each file in its project directory:
 
 ```
-members/.env.local
+members/.env                          (Next.js also accepts .env.local)
 Admin_system/.env
-Onboarding/.env
+Onboarding/packages/client/.env
+Onboarding/packages/server/.env
 community-proj/.env
 ```
 
-**4. Start the database**
+The `.env` files from Drive point to a shared remote dev database hosted by the team. **You don't need to run a local Postgres** for normal day-to-day development — the apps connect straight to the shared DB over the network.
+
+**4. (Optional) Start a local database**
+
+Skip this step unless you specifically need an isolated local Postgres (heavy migration testing, working offline, etc.). It requires Docker Desktop (`brew install --cask docker`).
 
 ```bash
-cd cme_db && docker-compose up -d && cd ..
+npm run db:up      # docker compose up -d in cme_db/
+npm run db:down    # stop it
 ```
 
-**5. Run database migrations**
+If you do start a local DB, you'll also need to change the `DATABASE_URL` in your `.env` files to point at `localhost:5432`.
+
+**5. (Optional) Run database migrations**
+
+Only needed if you started a local database in step 4. If you're using the shared remote DB, schemas are already migrated.
 
 ```bash
 cd members    && npx prisma migrate dev && cd ..
@@ -89,13 +106,23 @@ cd Onboarding && npx prisma migrate dev && cd ..
 
 **6. Start dev servers**
 
-Open a terminal per project:
+Run everything in one terminal (color-coded output, Ctrl-C kills all):
 
 ```bash
-cd members        && npm run dev    # → http://localhost:3000
-cd Admin_system   && npm run dev    # → http://localhost:4000
-cd community-proj && npm start      # → http://localhost:3001
-cd Onboarding     && npm run dev    # → http://localhost:5173
+npm run dev
+```
+
+| Project | Port |
+|---|---|
+| members | http://localhost:3100 |
+| Admin_system | http://localhost:4000 |
+| community-proj | http://localhost:3001 |
+| Onboarding (server + client) | http://localhost:5173 |
+
+Only need one project? Use a focused script:
+
+```bash
+npm run dev:members        # or :admin, :community, :onboarding, :notifications
 ```
 
 ---
