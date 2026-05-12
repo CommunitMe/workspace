@@ -1,0 +1,29 @@
+{
+  "name": "communitme-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CommunitMe workspace root — install and run every project from one place. Each project remains its own git submodule with its own package.json.",
+  "scripts": {
+    "postinstall": "npm run install:all",
+    "install:all": "npm run install:members && npm run install:admin && npm run install:community && npm run install:onboarding && npm run install:notifications",
+    "install:members": "npm install --prefix members",
+    "install:admin": "npm install --prefix Admin_system",
+    "install:community": "npm install --prefix community-proj",
+    "install:onboarding": "npm --prefix Onboarding run install:all",
+    "install:notifications": "npm install --prefix notifications/utils",
+    "dev": "concurrently -k -n members,admin,community,onboarding,notifications -c blue.bold,green.bold,yellow.bold,magenta.bold,cyan.bold \"npm run dev:members\" \"npm run dev:admin\" \"npm run dev:community\" \"npm run dev:onboarding\" \"npm run dev:notifications\"",
+    "dev:members": "npm run dev --prefix members",
+    "dev:admin": "npm run dev --prefix Admin_system",
+    "dev:community": "npm start --prefix community-proj",
+    "dev:onboarding": "npm run dev --prefix Onboarding",
+    "dev:notifications": "npm run dev --prefix notifications/utils",
+    "db:up": "cd cme_db && docker-compose up -d",
+    "db:down": "cd cme_db && docker-compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

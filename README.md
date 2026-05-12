@@ -53,11 +53,18 @@ git submodule update --init --recursive
 
 **2. Install dependencies**
 
+From the workspace root, one command installs everything:
+
 ```bash
-cd members        && npm install && cd ..
-cd Admin_system   && npm install && cd ..
-cd community-proj && npm install && cd ..
-cd Onboarding     && npm install && cd ..
+npm install
+```
+
+This installs the root runner (`concurrently`) and then cascades into every project (`members`, `Admin_system`, `community-proj`, `Onboarding`, `notifications/utils`) via the `postinstall` hook.
+
+If you only want one project, you can still install it directly:
+
+```bash
+npm run install:members      # or :admin, :community, :onboarding, :notifications
 ```
 
 **3. Set up environment variables**
@@ -77,8 +84,10 @@ community-proj/.env
 **4. Start the database**
 
 ```bash
-cd cme_db && docker-compose up -d && cd ..
+npm run db:up    # docker-compose up -d in cme_db/
 ```
+
+To stop it later: `npm run db:down`.
 
 **5. Run database migrations**
 
@@ -89,13 +98,23 @@ cd Onboarding && npx prisma migrate dev && cd ..
 
 **6. Start dev servers**
 
-Open a terminal per project:
+Run everything in one terminal (color-coded output, Ctrl-C kills all):
 
 ```bash
-cd members        && npm run dev    # → http://localhost:3000
-cd Admin_system   && npm run dev    # → http://localhost:4000
-cd community-proj && npm start      # → http://localhost:3001
-cd Onboarding     && npm run dev    # → http://localhost:5173
+npm run dev
+```
+
+| Project | Port |
+|---|---|
+| members | http://localhost:3100 |
+| Admin_system | http://localhost:4000 |
+| community-proj | http://localhost:3001 |
+| Onboarding (server + client) | http://localhost:5173 |
+
+Only need one project? Use a focused script:
+
+```bash
+npm run dev:members        # or :admin, :community, :onboarding, :notifications
 ```
 
 ---

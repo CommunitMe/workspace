@@ -2,6 +2,9 @@
 .DS_Store
 Thumbs.db
 
+# Node — root workspace runner deps + project node_modules
+node_modules/
+
 # Editor
 .vscode/
 *.swp
