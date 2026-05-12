@@ -104,10 +104,23 @@ cd Onboarding     && npm run dev    # → http://localhost:5173
 
 ### Daily sync
 
+Run this at the start of a session to get the latest workspace + every submodule on `dev`:
+
 ```bash
-git pull
-git submodule update --remote --merge
+git pull                                              # workspace itself (skills, CLAUDE.md, etc.)
+git submodule foreach 'git checkout dev && git pull'  # each submodule → latest dev
 ```
+
+Or use the slash command in Claude: `/sync`.
+
+**Caveat:** if you're mid-feature on a branch inside a submodule (e.g. `claude/COMY1-xxx-foo`), don't run the `foreach` blindly — it will switch you off your feature branch back to `dev`. Either skip that submodule, or merge `dev` into your feature branch manually:
+
+```bash
+cd <submodule>
+git pull origin dev   # merge latest dev into your feature branch
+```
+
+**Avoid** `git submodule update --remote --merge` — it forces a merge of each submodule's tracked branch into wherever it currently sits, which often produces conflicts when feature branches are checked out.
 
 ### After committing inside a project
 
