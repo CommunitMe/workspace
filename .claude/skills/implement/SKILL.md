@@ -26,7 +26,7 @@ Available projects:
 - `community-proj/` — Community management SPA. React 18 (JavaScript, NOT TypeScript), CRA, MUI 6, react-router-dom 6, Formik+Yup, Axios, i18next, SCSS
 - `notifications/` — Real-time notification microservice. Express 5, TypeScript 5.9, Prisma 7, PostgreSQL, Socket.IO 4, AJV validation, JWT auth
 
-The project directory is at: `C:/Users/User/Documents/keilot/workspace/{project}/`
+The project directory is at: `/workspace/{project}/`
 
 **For multi-project tickets:**
 - Read each project's SKILL.md separately
@@ -38,7 +38,7 @@ The project directory is at: `C:/Users/User/Documents/keilot/workspace/{project}
 ## Step 3: Load Memory & Learn from Past Runs
 
 Before planning, read the lessons file:
-- `C:/Users/User/Documents/keilot/workspace/.claude/memory/implement_lessons.md`
+- `workspace/.claude/memory/implement_lessons.md`
 
 This file contains lessons from previous runs — patterns that worked, mistakes to avoid,
 conventions discovered. Apply these lessons to your plan.
@@ -71,7 +71,7 @@ and coordinate through shared task lists.
 
 Tell Claude to create a team with teammates for each independent work stream. For example:
 "Create a team with 3 teammates: one for the server action and types, one for the UI components,
-and one for translations. Each should work in C:/Users/User/Documents/keilot/workspace/members/"
+and one for translations. Each should work in workspace/members/"
 
 **Critical rules for teammate instructions:**
 - Tell each teammate the EXACT project directory to work in
@@ -164,7 +164,7 @@ If the ticket involves UI changes (components, pages, styling), do a visual chec
 
 ### Setup — launch.json (workspace root, NOT submodule root)
 
-The preview tool reads `C:/Users/User/Documents/keilot/workspace/.claude/launch.json`. It runs from the workspace root, so `npm run dev` would invoke the workspace's concurrent-all-projects script. Use `--prefix <project>` instead:
+The preview tool reads `workspace/.claude/launch.json`. It runs from the workspace root, so `npm run dev` would invoke the workspace's concurrent-all-projects script. Use `--prefix <project>` instead:
 
 ```json
 {
