@@ -158,6 +158,12 @@ Three real traps caught on COMY1-287. Single source of truth lives in `members/.
 ### Order modal step deep links (members/)
 The home page order modal uses `?orderId=…&step=N&pricelist=…`. **`step=10` is post-payment feedback ("AllDone"), not "view order".** For viewing a `WAITING_FOR_PAYMENT` order, use `step=8`. Authoritative `status_id → step` mapping is in `src/components/MyOrders/my-orders-tab.tsx` `STATUS_ID_TO_STEP`. Derive from there, never hardcode `step=10` thinking it means "show details".
 
+### Canceled vs completed share the same step (members/)
+`STATUS_NAME_TO_STEP` collapses `CLOSED` (50), `CANCELED_BY_MEMBER` (100), and `CANCELED_BY_SUPPLIER` (101) all onto step 10 = `Step11OrderCompleted`. Any per-step UI string in `MembersOrderModalContent.tsx` (sidebar title, header label, CTA copy) must branch on a separate `isOrderCanceled = orderDetails?.status === "CANCELED_BY_MEMBER" || === "CANCELED_BY_SUPPLIER"` derivation — **never on the existing `orderCancelled` memo, which is offer-based** ("all suppliers declined while searching") and means something different. The two flags can both be true or both be false; don't conflate them. Fixed in COMY1-278 / PR #194.
+
+### MinIO presigned uploads & browser reachability (members/)
+The order-attachment upload flow at `src/components/Modals/MembersOrderModal/MembersOrderModalContent.tsx` → `uploadAttachments` does browser → MinIO PUT via a presigned URL built from `MINIO_ENDPOINT` (see `server/lib/config/minio.ts`). If that endpoint is an **internal hostname** (docker name / private IP) or `MINIO_USE_SSL=false` behind an https app, **the browser silently blocks the PUT** (DNS failure or mixed-content) and the only client-visible signal is the generic `steps.uploadError` toast (`"אירעה שגיאה בהעלאת הקבצים. אנא נסו שוב"`). Before chasing a code bug for "upload fails for large videos but images work" (where in practice images sometimes squeak through caches), **first check the staging `.env` for a public HTTPS `MINIO_ENDPOINT`** — it's almost always env, not code. The signed-URL/confirm route pair (`src/app/api/orders/[orderId]/files/{signed-url,confirm}/route.ts`) is structurally fine; reverting to server-proxied upload contradicts the deliberate move in commit `f87390e` and reintroduces Next.js body-size/Turbopack issues.
+
 ## Step 7b: Browser QA (for frontend tasks)
 
 If the ticket involves UI changes (components, pages, styling), do a visual check.
