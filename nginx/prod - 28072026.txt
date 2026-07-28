@@ -1,0 +1,298 @@
+# Rate limiting zones
+limit_req_zone $binary_remote_addr zone=onboarding_api_limit:10m rate=10r/s;
+
+#minio
+server {
+    server_name minio.keilot.com;
+    location / {
+        proxy_pass http://127.0.0.1:9000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+
+        proxy_set_header Authorization $http_authorization;
+        proxy_pass_header  Authorization;
+
+        # Required for large uploads
+        client_max_body_size 0;
+        proxy_buffering off;
+        proxy_request_buffering off;
+        chunked_transfer_encoding on;
+    }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/minio.keilot.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/minio.keilot.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+# Onboarding Frontend
+server {
+    include /etc/nginx/upstreams/onboarding_frontend_prod.conf;
+    server_name welcome.keilot.com;
+    location / {
+        proxy_pass $upstream_onboarding_frontend_prod;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/admin-api.keilot.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/admin-api.keilot.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+
+}
+
+# Onboarding Backend
+server {
+    include /etc/nginx/upstreams/onboarding_backend_prod.conf;
+    server_name welcome-api.keilot.com;
+    location / {
+        proxy_pass $upstream_onboarding_backend_prod;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/admin-api.keilot.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/admin-api.keilot.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+
+}
+
+# Admin Frontend
+server {
+    include /etc/nginx/upstreams/admin_system_frontend_prod.conf;
+
+    server_name admin.keilot.com;
+    location / {
+        proxy_pass $upstream_admin_system_frontend_prod;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/admin-api.keilot.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/admin-api.keilot.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+
+}
+
+# Admin Backend
+server {
+    include /etc/nginx/upstreams/admin_system_backend_prod.conf;
+
+    server_name admin-api.keilot.com;
+    location / {
+        proxy_pass $upstream_admin_system_backend_prod;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/admin-api.keilot.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/admin-api.keilot.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+
+}
+
+
+#members
+# nginx.conf for Next.js
+server {
+    server_name platform.keilot.com;
+    include /etc/nginx/upstreams/members_prod.conf;
+
+    # Enable compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 10240;
+    gzip_proxied expired no-cache no-store private auth;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml application/javascript;
+    gzip_disable "MSIE [1-6]\.";
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
+    add_header Referrer-Policy "strict-origin-when-cross-origin";
+
+    # Main location block for Next.js app
+    location / {
+        proxy_pass $upstream_members;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Needed for Next.js SSR
+        proxy_buffering off;
+        proxy_set_header X-Forwarded-Host $host;
+    }
+
+    # Custom error page
+    error_page 404 /404;
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/platform.keilot.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/platform.keilot.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+# notifications app
+server {
+    include /etc/nginx/upstreams/notifications_prod.conf;
+
+    server_name notifications.keilot.com;
+    location / {
+        proxy_pass $upstream_notifications;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/notifications.keilot.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/notifications.keilot.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+server {
+    if ($host = welcome.keilot.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+
+    listen 80;
+    server_name welcome.keilot.com;
+    return 404; # managed by Certbot
+
+
+}
+server {
+    if ($host = welcome-api.keilot.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+
+    listen 80;
+    server_name welcome-api.keilot.com;
+    return 404; # managed by Certbot
+
+
+}
+
+server {
+    if ($host = admin.keilot.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+
+    server_name admin.keilot.com;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}
+server {
+    if ($host = admin-api.keilot.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+
+    server_name admin-api.keilot.com;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}
+
+server {
+    if ($host = platform.keilot.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    server_name platform.keilot.com;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}
+
+server {
+    if ($host = notifications.keilot.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+
+    server_name notifications.keilot.com;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}
+server {
+    if ($host = minio.keilot.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    server_name minio.keilot.com;
+    listen 80;
+    return 404; # managed by Certbot
+
+
+}
