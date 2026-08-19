@@ -149,6 +149,7 @@ Stack: React 18 (JavaScript), Create React App, MUI 6, i18next, Formik. No proje
 - **`GenericSwiperDialog/`** — Two-column dialog with Swiper carousel, header, footer actions, tooltips.
 - **`InviteModal/`** — Success modal showing invite details (email, phone, WhatsApp) with copy actions.
 - **`JoinCommunityModel/`** — Modal for joining community with discount input, terms checkbox, validation.
+- **`JoinRequestReceivedModal/`** — AlertModal variant greeting a supplier who arrived from a community invite link: tells them a join request is waiting and opens the offer wizard.
 - **`MaximumCapacityReachedModal/`** — Alert modal informing user community has reached max capacity.
 - **`NeedPricelistModal/`** — Alert modal requesting pricelist creation before proceeding.
 - **`NewPricelistCreatedModal/`** — Success modal confirming pricelist creation.
