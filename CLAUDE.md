@@ -79,3 +79,4 @@ When asked to implement a ticket (`COMY1-*`, `COMY-ADMIN-*`, etc.):
 - Commit inside the project repo first, then bump the pointer in the workspace
 - Never force-push submodule branches — coordinate with the team
 - Run `upgrader` agent after every implementation run to save lessons
+- **Any change that stores data about a user** (new table/column with `profile_id` / `supplier_id` / `created_by`, new column on `profiles` or `suppliers`, saved cards, per-user logs) **must also update the delete-user API** in both `Admin_system` and `members` — follow `.claude/skills/delete-user-sync/SKILL.md`
