@@ -91,6 +91,7 @@ Stack: React 18 (JavaScript), Create React App, MUI 6, i18next, Formik. No proje
 
 ### Components — `src/Components/`
 
+- **`AgentChat/`** — The supplier's chat assistant (COMY1-390): floating launcher + side panel (desktop) / full-screen drawer (mobile), streams `POST /api/agent` with its own SSE reader (`streamReader.js`, no `@ai-sdk/react`), lookup chips, handoff buttons that `navigate()`, markdown-lite `AgentMessageText` (RTL when the reply has Hebrew). Renders nothing unless `GET /api/agent/status` is on. Mounted once in `CommunityLayout`; i18n namespace `agent`.
 - **`AddressMapInput/`** — Address picker with Google Maps autocomplete and place ID lookup. Used in profile and location forms.
 - **`AppLoader/`** — Full-screen circular progress loader with custom branding colors.
 - **`CommunityCard/`** — Community display card with location, manager info, tags, and join/cancel actions.
