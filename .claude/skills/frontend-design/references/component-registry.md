@@ -79,6 +79,24 @@ Stack: Next.js 16, React 19, Tailwind v4, shadcn/ui-style primitives. Project sk
 - **`PhoneNumberInput/`** — Phone input with country prefix. React-phone-input-2, country data, form integration.
 - **`SingleServiceAccordian/`** — Service accordion item. Price, currency, unit display. Locale-aware (Hebrew RTL).
 
+### Community square — `src/components/square/`
+
+Data hooks live in `square/hooks/` (`use-square-feed`, `-post`, `-thread`, `-live`, `-typing`, `-unread`, `-attachments`). **Reusable beyond the square:** `square-linkified-text`, `square-thread-markers`, `square-state-message`, `square-confirm-dialog`.
+
+- **`square-post-card.tsx`** — Feed card linking to `/square/{id}` (OrderCard shell). Thumbnail, type chip, pinned/closed flags, unread dot + bold title, author, relative time, comment count.
+- **`square-type-chip.tsx`** — Post-type `Badge` (discussion | question | need | offer | announcement). Exports `SQUARE_TYPE_STYLES` color map.
+- **`square-comment-bubble.tsx`** — Chat bubble for one comment (mine at the end on the brand tint, others white with avatar/name). Status sent | sending | failed with retry/discard, reply/edit/delete/report/copy callbacks. Also exports **`SquareReplyQuote`** (quoted message in a reply and in the composer's reply bar).
+- **`square-composer.tsx`** — Bottom bar of a post: auto-growing textarea, photo button, send; reply and edit modes; `notice` replaces it (closed post / admins-only). Enter sends on desktop, newline on touch.
+- **`square-attachment-picker.tsx`** — `SquareAttachButton` (icon or labelled photo button + hidden file input) and `SquareAttachmentChips` (preview chips with upload spinner, remove, error). Driven by `useSquareAttachments`.
+- **`square-image-gallery.tsx`** — Default `SquareImageGrid` (post/comment photos, `compact` for bubbles) and `SquareLightbox` (Dialog + Carousel full-size viewer, swipe/arrows).
+- **`square-linkified-text.tsx`** — **Reusable.** User text as plain text with clickable http(s)/www links (`rel="nofollow ugc noopener noreferrer"`), `dir="auto"`, pre-wrap. Exports pure `linkifyParts()`.
+- **`square-thread-markers.tsx`** — **Reusable chat markers.** `SquareDateSeparator` (centered date pill), `SquareUnreadDivider` ("new comments" line), `SquareTypingIndicator` (names → "X is typing…", aria-live).
+- **`square-report-dialog.tsx`** — Report a post or comment: spam / offensive / other + optional note (≤ 500).
+- **`square-confirm-dialog.tsx`** — **Reusable.** Destructive confirm dialog (CancelOrderDialog layout); async `onConfirm` returning boolean, closes on success, locked while busy.
+- **`square-header-link.tsx`** — Header entry next to the bell: round button on mobile, labelled pill on xl, coral unread badge. Exports `formatSquareBadge()` ("99+").
+- **`square-state-message.tsx`** — **Reusable.** Centered empty/error state: icon circle, text, optional action, `role` status | alert.
+- Internal parts (not for reuse): `square-feed`, `square-shell`, `square-post-view`, `square-post-content`, `square-comment-thread`, `square-compose-form`, `square-author-avatar`, `square-post-card-skeleton`.
+
 ### Legacy / do-not-reference
 
 *None detected.*

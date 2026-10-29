@@ -68,6 +68,9 @@ audit must be either handled or listed under "Deliberately kept" below.
 |---|---|---|
 | Personal data / credentials / per-user logs | **DELETE** rows | `banks_accounts`, `member_saved_cards`, `grow_saved_cards`, `feedbacks`, `community_ai_traces`, `community_ai_usage`, `onboarding_profiles` (matched by email/phone) |
 | Supplier configuration (pricing, discounts, fulfilment, districts, files) | **DELETE** rows | `supplier_*_config`, `*_discounts_*`, `files_suppliers` |
+| Per-user community-content state | **DELETE** rows | `square_attachments` (by `uploader_profile_id`), `square_post_members`, `square_community_reads`, `square_reports` (by `reporter_profile_id`) |
+| User-written content other people replied to | **DELETE if no one else is in it, else BLANK** | `square_posts`: delete when no comment by someone else (cascades), otherwise `title = '—'`, `body = NULL`; `square_comments`: `body = NULL`, `deleted_at` set |
+| The user as moderator on other people's rows | **NULL the column** | `square_posts` / `square_comments.deleted_by_profile_id`, `square_reports.resolved_by_profile_id` |
 | Rows other records still reference (orders point at them) | **ANONYMIZE / deactivate**, never delete | `profiles`, `suppliers` (status `DELETED`), `products` / `restaurants` (status `NOT_ACTIVE`) |
 | Order & payment records | **KEEP**, but strip secrets | `grow_payment_authorizations` (null `card_token`, `card_token_iv`) |
 | Financial ledger / revenue shares | **KEEP** untouched | `transactions`, `user_balance`, `rs_*` |
@@ -81,6 +84,11 @@ Ordering rules:
 - Anything matched by the user's email/phone runs **before** the final `UPDATE profiles`
   wipes them.
 - Collect MinIO file keys **before** the transaction, remove objects only **after** commit.
+  Square images are MinIO keys `{file_uuid}.{ext}` (plus `thumb_file_uuid`); `square_attachments`
+  has no `file_name`, so derive the extension from `mime` (`image/jpeg` → `jpg`). Also remove
+  every object under `square/incoming/{profileId}/` (unconfirmed presigned uploads).
+- Delete the user's uncommented posts **before** blanking the rest, so the blanking only hits
+  posts that others are still in.
 - Tables already `ON DELETE CASCADE` from something we delete (e.g. `notifications_views`
   from `notifications_recipients`) don't need their own statement — note it in a comment.
 
@@ -115,7 +123,8 @@ Never run a real delete on dev data. Prove every statement executes, then roll b
 - **members**: a throw-away vitest file that mocks `createAction` (return the handler),
   `assertNoOpenOrders` and `fileService`, and wraps `prisma.$transaction` to append
   ``prisma.$executeRaw`SELECT 1/0` `` — the batch must fail with *division by zero* (meaning
-  every real statement succeeded) and the profile must be unchanged afterwards.
+  every real statement succeeded) and the profile must be unchanged afterwards. Swap
+  `prisma.$transaction` by assignment and restore it; `vi.spyOn` fails because the client is a Proxy.
 - Pick a profile that is a supplier **and** a member and has rows in the new table.
 - Delete both harness files before committing; `npx tsc --noEmit` in both projects.
 
