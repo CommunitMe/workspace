@@ -64,6 +64,7 @@ Stack: Next.js 16, React 19, Tailwind v4, shadcn/ui-style primitives. Project sk
 ### Composites — `src/components/`
 
 - **`AddressMapInput/`** — Google Maps autocomplete. Address parsing, place ID, city/street/neighborhood extraction.
+- **`app/components/chatbot/agent/AgentThinking.tsx`** — **Reusable AI "thinking" line.** Three staggered pulsing dots + a status label (`thinking` → `lookingUp` while a tool runs → `stillWorking` after 8 s), `role="status" aria-live="polite"`, dots `aria-hidden`, still under `motion-safe`. Use it wherever an AI reply is pending; never a spinner alone.
 - **`AvatarStack.tsx`** — Stacked avatar display. Shows up to N avatars with count badge, community manager trophy.
 - **`CommercialToasts/CustomToast.tsx`** — Toast with avatar, progress bar, action link. Dismissible after duration.
 - **`CustomDatePicker/`** — Date picker with custom header. Month/year selects, locale support, max date prop.
@@ -111,6 +112,7 @@ Stack: React 18 (JavaScript), Create React App, MUI 6, i18next, Formik. No proje
 
 - **`AddressMapInput/`** — Address picker with Google Maps autocomplete and place ID lookup. Used in profile and location forms.
 - **`AppLoader/`** — Full-screen circular progress loader with custom branding colors.
+- **`AgentChat/AgentThinking.js`** — **Reusable AI "thinking" line** (MUI twin of members' `AgentThinking.tsx`). Teal dots + `agent:thinking` / `lookingUp` / `stillWorking` label, `role="status"`, reduced-motion safe. `styles.thinkingDot(i)` carries the keyframes.
 - **`CommunityCard/`** — Community display card with location, manager info, tags, and join/cancel actions.
 - **`CommunitySuppliersHeaderFilters/`** — Header filters for supplier lists: search, category/location dropdowns, and mobile filter drawer.
 - **`CustomAccordion/`** — MUI Accordion wrapper with summary actions, avatar support, and detail rows.
@@ -144,6 +146,7 @@ Stack: React 18 (JavaScript), Create React App, MUI 6, i18next, Formik. No proje
 - **`MySuppliersTable/`** — Supplier table with sort labels, avatars, and action menu (not drawer-based).
 - **`NotificaitonItem/`** — Notification item with formatted date, avatar, action buttons (note: typo in folder name).
 - **`PhoneNumberInput/`** — Phone input with country flag selector and custom styling.
+- **`ProductStatusChip/`** — Small status chip for a catalog item (`product` prop): "Draft" (neutral grey) or "Paused" (orange), nothing for active. Status comes from `getProductStatus()` in `src/Constants/productStatus.js` (falls back to `is_active`). Same tone-map pattern as `KycStatusChip`. Used in `ManagePricelists/.../ProductsTable`.
 - **`RequestServiceAccordian/`** — Service request accordion with pricing table and disabled state handling.
 - **`SearchField/`** — Search input with icon, autofill disabled, placeholder support.
 - **`SingleSelectAutocomplete/`** — Autocomplete dropdown with search, custom styling, error handling.
