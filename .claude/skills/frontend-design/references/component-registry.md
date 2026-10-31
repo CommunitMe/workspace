@@ -74,6 +74,7 @@ Stack: Next.js 16, React 19, Tailwind v4, shadcn/ui-style primitives. Project sk
 - **`ImageUploader/`** — File upload with preview. Size/type validation, remove button, error handling, initial/temp state.
 - **`Input/NumericInput.tsx`** — Numeric-only input. Allows digits and delimiters (.,), filters duplicates.
 - **`Kard/KardButton.tsx`** — Wallet payment button. Opens Kard modal for payment flow (plus KardModal, KardCardLayout, KardCreditCardVisual).
+- **`Kard/KardLinkRoute.tsx`** — URL-driven Kard (`?kard=<token>`) for a QR scanned with the phone's own camera; mounted once in the `(home)` layout next to the order routes. Pairs with `src/app/k/[token]/route.ts` and `KardModal.initialScanPayload`.
 - **`Modals/MembersOrderModal/`** — Order modal dialog. URL-driven state (plus nested service-detail / payment-info components).
 - **`MyProfile/`** — Profile drawer. Tabs: profile (enabled), orders/card/coins (disabled). Fetches user profile data.
 - **`Notifications/`** — Notifications list. Socket-integrated, dynamic routing (plus NotificationsTrigger, NotificationItem, ContactInfoPopover).
