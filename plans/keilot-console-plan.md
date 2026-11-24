@@ -7,7 +7,11 @@ Status (2026-11-24): **P0 built, not deployed.**
 - Changes from the original plan, based on what already exists:
   - Sign-in reuses the normal Keilot login cookie (Onboarding Google/phone) — no separate OAuth client.
   - Writes go through `Admin_system /api/staff` with the staff member's own cookie, not a service key.
-- Still open for P0: dev deploy (host/domain, CI, `CONSOLE_DB_URL` secret) and Onboarding "return to Console after login".
+- Still open for P0: dev deploy (host/domain, CI, `CONSOLE_DB_URL` secret). "Return to Console after login" = Onboarding#203 (needs the `VITE_CONSOLE_URL` variable per env).
+
+Status (2026-11-24, later): **P1 built, verified on dev, not merged.** console#1 + Admin_system#425 (stacked on #424).
+Communities, Suppliers, Feedback, Rev-Share (+ read-only config) pages; actions: delete account (owner),
+reset view indications (support), remove supplier from a community (ops). Left for later: editing Rev-Share config.
 
 ## 1. What we have today (findings)
 
