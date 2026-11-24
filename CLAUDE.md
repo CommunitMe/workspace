@@ -19,6 +19,7 @@ For human setup instructions see [README.md](README.md).
 | `notifications/` | Express 5, TypeScript, Prisma 7, Socket.IO 4 |
 | `cme_db/` | PostgreSQL schema & migrations |
 | `pricelist_tools/` | Pricelist utilities |
+| `console/` | Keilot Console — internal staff back-office (replaces Appsmith KA). Next.js 16, next-intl (he/en), read-only DB role; writes only via `Admin_system /api/staff` |
 
 ---
 
@@ -43,6 +44,9 @@ commy/
 
   notifications/.claude/skills/
     notif-development/      ← Express 5 + Socket.IO conventions
+
+  console/.claude/skills/
+    console-development/    ← Staff back-office: read-only reads, audited writes via /api/staff
 ```
 
 **Rule:** Always read the project's `SKILL.md` before writing any code.
