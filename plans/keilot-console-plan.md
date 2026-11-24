@@ -13,6 +13,13 @@ Status (2026-11-24, later): **P1 built, verified on dev, not merged.** console#1
 Communities, Suppliers, Feedback, Rev-Share (+ read-only config) pages; actions: delete account (owner),
 reset view indications (support), remove supplier from a community (ops). Left for later: editing Rev-Share config.
 
+Status (2026-11-25): **P2 built, verified on dev, not merged.** console#2 + Admin_system#426 (stacked on #1 / #425).
+- AI agents (`/agents`): every tab of the Appsmith AI Agents app. Writes are audited: thresholds, rate/margin, model prices, the catalog-skill switch, and handle/reopen on unanswered questions.
+- Catalog review (`/catalog`): queue, item page, approve / reject / merge / move / rename, bulk approve, health, CSV export.
+- `reviewed_by` / `handled_by` now hold the staff profile id.
+- Agent kill switch: only the env var `ADMIN_AGENT_ENABLED` (status shown, not switchable). Per-community `community_features` are shown read-only, because no agent reads them.
+- Retire in Appsmith once deployed: Keilot AI Agents - Dev / - Prod, and Keilot Catalog Review (+ copies).
+
 ## 1. What we have today (findings)
 
 **KA = Appsmith v1.94 at ka-staging.keilot.com.** 9 apps in one workspace:
