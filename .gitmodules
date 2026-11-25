@@ -33,3 +33,7 @@
 [submodule "pricelist_tools"]
 	path = pricelist_tools
 	url = https://github.com/CommunitMe/pricelist_tools.git
+[submodule "console"]
+	path = console
+	url = https://github.com/CommunitMe/console.git
+	branch = dev
