@@ -13,7 +13,8 @@ Status (2026-11-24, later): **P1 built, verified on dev, not merged.** console#1
 Communities, Suppliers, Feedback, Rev-Share (+ read-only config) pages; actions: delete account (owner),
 reset view indications (support), remove supplier from a community (ops). Left for later: editing Rev-Share config.
 
-Status (2026-11-25): **P2 built, verified on dev, not merged.** console#2 + Admin_system#426 (stacked on #1 / #425).
+Status (2026-11-25): **P0–P2 merged to dev** after a code review (cme_db#121, Admin_system#424–426, members#369, Onboarding#203, console#1–3). Review fixes: console_ro could read OTP codes / password hashes / Grow KYC (fixed + re-applied on DEV), catalog row locks, bulk cap 500, CSV formula guard. **Before staging/prod:** apply cme_db#121 there first. Open follow-ups: delete-user / remove-supplier audit row is written after the write (not in its transaction); deleting the last owner's account from the app isn't blocked. PM review: plans/keilot-console-pm-review.md.
+Previous: **P2 built, verified on dev.** console#2 + Admin_system#426 (stacked on #1 / #425).
 - AI agents (`/agents`): every tab of the Appsmith AI Agents app. Writes are audited: thresholds, rate/margin, model prices, the catalog-skill switch, and handle/reopen on unanswered questions.
 - Catalog review (`/catalog`): queue, item page, approve / reject / merge / move / rename, bulk approve, health, CSV export.
 - `reviewed_by` / `handled_by` now hold the staff profile id.
